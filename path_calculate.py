@@ -11,15 +11,18 @@ def calculate_path(lat, lng):
         return
     try:
         response = requests.get(
-            url="http://restapi.amap.com/v3/direction/walking",
+            url="http://restapi.amap.com/v3/direction/transit/integrated",
             params={
                 "origin": "{},{}".format(lng, lat),
                 "destination": config['latlng'],
-                "key": random.choice(config['keys'])
+                "key": random.choice(config['keys']),
+                "city": "深圳"
+
             },
         )
+        print(response.url)
         if response.status_code == 200:
-            detail = json.loads(response.text)['route']['paths']
+            detail = json.loads(response.text)['route']['transits']
             if len(detail) > 0:
                 return detail[0]
     except requests.exceptions.RequestException:

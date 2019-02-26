@@ -26,7 +26,7 @@ config = {
         "http://sz.ziroom.com/z/nl/z2-r1111TO1700-s2%E5%8F%B7%E7%BA%BF%28%E8%9B%87%E5%8F%A3%E7%BA%BF%29-t%E9%BB%84%E8%B4%9D%E5%B2%AD.html"
     ],
     # 望京SOHO 经纬度，替换成自己的坐标，坐标可以从 http://www.gpsspg.com/maps.htm 获得，选腾讯高德坐标
-    'latlng': '114.0948290000，22.5406410000',
+    'latlng': '114.0948290000,22.5406410000',
     # 可选 房间朝向
     # 'toward':'南',
     # 可选 过滤掉的房间朝向
@@ -36,7 +36,7 @@ config = {
     # 必选 最高价格 土豪自己改代码
     "max_price": 1700,
     # 可选 最大步行距离 单位：米
-    "max_distance": 500,
+    "max_distance": 6500,
     # 可选 最长步行时间 单位：秒
-    "max_time": 60 * 20
+    "max_time": 60 * 60
 }

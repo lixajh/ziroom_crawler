@@ -45,7 +45,7 @@ def parse_page_summary(url):
         # info['price'] = int(price)
         info['area'] = float(number_re.findall(detail[0])[0])
         # if info['area'] > 10 and config['max_price'] > info['price'] > 500:
-        if info['area'] > 10:
+        if info['area'] > 5:
             sleep(.5)
             parse_page_detail(info)
 
@@ -77,10 +77,10 @@ def parse_page_detail(page_detail_info):
     if 'latlng' in config:
         path = calculate_path(lat, lng)
         if path:
-            page_detail_info['distance'] = path['distance']
+            page_detail_info['distance'] = path['walking_distance']
             page_detail_info['duration'] = path['duration']
             if 'max_distance' in config and int(path['distance']) > config['max_distance']:
-                print(page_detail_info['room_number'], "距离不符合")
+                print(page_detail_info['room_number'], "距离不符合:" + path['distance'])
                 return
             if 'max_time' in config and int(path['duration']) > config['max_time']:
                 print(page_detail_info['room_number'], "时间不符合")
