@@ -35,16 +35,17 @@ def parse_page_summary(url):
         details = i.xpath('//div[@class="txt"]')[0]
         page_url = details.xpath('//h3/a/@href')[0]
         detail = details.xpath('//div[@class="detail"]/p/span/text()')
-        price = i.xpath('//p[@class="price"]/text()')[0]
-        price = number_re.findall(price)[0]
+        # price = i.xpath('//p[@class="price"]/text()')[0]
+        # price = number_re.findall(price)[0]
         info['url'] = 'http:' + page_url
         room_number = number_re.findall(info['url'])[0]
         if room_number in file_room_number or room_number in [item['room_number'] for item in suitable_info]:
             continue
         info['room_number'] = room_number
-        info['price'] = int(price)
+        # info['price'] = int(price)
         info['area'] = float(number_re.findall(detail[0])[0])
-        if info['area'] > 10 and config['max_price'] > info['price'] > 500:
+        # if info['area'] > 10 and config['max_price'] > info['price'] > 500:
+        if info['area'] > 10:
             sleep(.5)
             parse_page_detail(info)
 
@@ -139,8 +140,8 @@ def parse_page_detail(page_detail_info):
     ellipsis = ''.join(detail_right.xpath('//p[@class="pr"]/span[@class="ellipsis"]/text()'))
     page_detail_info['ellipsis'] = ellipsis
     # 价格
-    price = ''.join(detail_right.xpath('//span[@class="room_price"]/text()'))
-    page_detail_info['price'] = int(price.replace("￥", ''))
+    # price = ''.join(detail_right.xpath('//span[@class="room_price"]/text()'))
+    # page_detail_info['price'] = int(price.replace("￥", ''))
     # 标签
     room_tags = detail_right.xpath('//p[contains(@class,"room_tags")]//span/text()')
     page_detail_info['room_tags'] = room_tags
