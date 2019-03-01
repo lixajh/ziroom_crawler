@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding=utf8 -*-
+# coding: utf-8
 # Created by dengqiangxi at 2018/4/8
+
 
 from requests_html import HTMLSession
 from path_calculate import calculate_path
@@ -12,13 +14,21 @@ from mail_utils import sendmail
 
 from fake_useragent import UserAgent
 
+# import sys
+# defaultencoding = 'utf-8'
+# if sys.getdefaultencoding() != defaultencoding:
+#     reload(sys)
+#     sys.setdefaultencoding(defaultencoding)
+
+
 def get_page_info(url):
     page = session.get(url=url, headers={
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
         "Accept-Encoding": "gzip, identity",
         "Cache-Control": "max-age=0",
         "Upgrade-Insecure-Requests": "1",
-        "User-Agent": ua.random,
+        # "User-Agent": ua.random,
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.77 Safari/537.36",
         "Accept-Language": "zh-CN,zh;q=0.9,ja;q=0.8",
     })
     return page.html
@@ -26,6 +36,7 @@ def get_page_info(url):
 
 # 解析列表页
 def parse_page_summary(url):
+    print("列表页url：" + url)
     html = get_page_info(url)
     if not html:
         raise Exception('获取数据失败')
@@ -48,7 +59,8 @@ def parse_page_summary(url):
         if info['area'] > 5:
             sleep(.5)
             parse_page_detail(info)
-
+            if(len(suitable_info) > 0):
+                break
     next_pages = html.xpath('//div[@class="pages"]/a[@class="next"]/@href')
     if len(next_pages) > 0:
         next_page_url = 'http:' + next_pages[0]
@@ -60,6 +72,7 @@ def parse_page_summary(url):
 # 解析详情页
 def parse_page_detail(page_detail_info):
     url = page_detail_info['url']
+    print("详情url：" + url)
     html = get_page_info(url)
     if not page_detail_info:
         page_detail_info = {}
@@ -79,7 +92,8 @@ def parse_page_detail(page_detail_info):
         if path:
             page_detail_info['distance'] = path['walking_distance']
             page_detail_info['duration'] = path['duration']
-            if 'max_distance' in config and int(path['distance']) > config['max_distance']:
+            print('经纬度：' + str(lng) + "," + str(lat))
+            if 'max_distance' in config and int(page_detail_info['distance']) > config['max_distance']:
                 print(page_detail_info['room_number'], "距离不符合:" + path['distance'])
                 return
             if 'max_time' in config and int(path['duration']) > config['max_time']:
@@ -101,9 +115,10 @@ def parse_page_detail(page_detail_info):
     # 房间描述
     about_room = detail_left.xpath('//div[contains(@class,"aboutRoom")]/p/text()')
     description = about_room[0]
-    traffic = about_room[1]
+    # 交通信息变更，在此查不到了
+    # traffic = about_room[1]
     page_detail_info['description'] = description
-    page_detail_info['traffic'] = traffic
+    # page_detail_info['traffic'] = traffic
 
     # 房间内配置
     configuration = detail_left.xpath('//ul[contains(@class,"configuration")]/li/text()')
@@ -173,7 +188,6 @@ def parse_page_detail(page_detail_info):
 
     suitable_info.append(page_detail_info)
 
-
 def analyze_and_send_mail():
     global current_favor_rooms
     room_numbers = [x['room_number'] for x in suitable_info]
@@ -183,14 +197,15 @@ def analyze_and_send_mail():
         str_new_info = '\n' + '\n'.join(room_numbers) if file_room_number else '\n'.join(room_numbers)
         current_favor_rooms.write(str_new_info)
         current_favor_rooms.close()
-        with open("./templates/template.html", "r") as fd:
-            template = Template(fd.read())
+        with open("./templates/template.html", "r", encoding="utf-8") as fd:
+            aaa = fd.read()
+            template = Template(aaa)
             res = template.render(new_room_info=new_room_info)  # 渲染
             sendmail("自如找到了{}个房源".format(len(new_room_info)), res)
 
 
 if __name__ == '__main__':
-    ua = UserAgent()
+    # ua = UserAgent()
     # 只匹配数字
     number_re = re.compile("(\d+)")
 
